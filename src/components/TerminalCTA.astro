@@ -1,0 +1,156 @@
+---
+/**
+ * Terminal CTA — "Ready to quit the matrix?"
+ * Final call-to-action with a terminal-style code block + GitHub star button
+ */
+---
+
+<section class="terminal-section" id="get-started">
+  <div class="section">
+    <p class="section-label">// Get Started</p>
+    <h2 class="section-title">Ready to quit the matrix?</h2>
+    <p class="section-subtitle">
+      Three commands. No GPU. No hidden layers. No cloud bill.
+    </p>
+
+    <div class="terminal-window">
+      <div class="terminal-bar">
+        <span class="terminal-dot dot-red"></span>
+        <span class="terminal-dot dot-yellow"></span>
+        <span class="terminal-dot dot-green"></span>
+        <span class="terminal-title">zsh — richlearning</span>
+      </div>
+      <div class="terminal-body">
+        <div class="terminal-line">
+          <span class="terminal-prompt">$</span>
+          <span class="terminal-cmd">git clone https://github.com/richlearning/RLCartographer.git</span>
+        </div>
+        <div class="terminal-line">
+          <span class="terminal-prompt">$</span>
+          <span class="terminal-cmd">cd RLCartographer</span>
+        </div>
+        <div class="terminal-line">
+          <span class="terminal-prompt">$</span>
+          <span class="terminal-cmd">dotnet run</span>
+        </div>
+        <div class="terminal-line terminal-output">
+          <span class="terminal-ok">✓</span>
+          <span>Identity search complete — 0 hidden layers, 0 kWh training, 4 steps</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <a href="https://github.com/richlearning/RLCartographer" class="cta-btn cta-primary" target="_blank" rel="noopener">
+        ★ Star on GitHub
+      </a>
+      <a href="#benchmark" class="cta-btn cta-secondary">
+        Read the Benchmarks ↑
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .terminal-section {
+    background: var(--void);
+  }
+
+  .terminal-window {
+    max-width: 640px;
+    margin: 2.5rem auto 2rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    background: #0d0d0d;
+  }
+  .terminal-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .terminal-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+  .dot-red { background: #ff5f57; }
+  .dot-yellow { background: #febc2e; }
+  .dot-green { background: #28c840; }
+  .terminal-title {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-left: auto;
+  }
+
+  .terminal-body {
+    padding: 1.25rem 1.5rem;
+    display: flex; flex-direction: column; gap: 0.6rem;
+  }
+  .terminal-line {
+    display: flex; align-items: center; gap: 0.6rem;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  .terminal-prompt {
+    color: var(--accent);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .terminal-cmd { color: var(--text); }
+  .terminal-output {
+    color: var(--text-dim);
+    margin-top: 0.25rem;
+    font-size: 0.8rem;
+  }
+  .terminal-ok {
+    color: var(--accent);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .cta-row {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+  .cta-btn {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    letter-spacing: 0.02em;
+  }
+  .cta-primary {
+    background: var(--accent);
+    color: var(--void);
+  }
+  .cta-primary:hover {
+    background: #33ff99;
+    box-shadow: 0 0 20px rgba(0,255,136,0.3);
+  }
+  .cta-secondary {
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    background: transparent;
+  }
+  .cta-secondary:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  @media (max-width: 640px) {
+    .terminal-body { padding: 1rem; }
+    .terminal-line { font-size: 0.75rem; }
+    .cta-row { flex-direction: column; align-items: center; }
+    .cta-btn { width: 100%; max-width: 280px; text-align: center; }
+  }
+</style>

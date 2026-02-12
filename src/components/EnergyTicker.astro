@@ -1,0 +1,178 @@
+---
+/**
+ * Energy Ticker Section — Real-time comparison of global DL energy vs Rich Learning
+ */
+---
+
+<section class="energy-section" id="energy">
+  <div class="section">
+    <p class="section-label">// The Heavy Cost of "Deep"</p>
+    <h2 class="section-title">Deep Learning Brute-Forces Intelligence.<br />Rich Learning Navigates It.</h2>
+    <p class="section-subtitle">
+      Every time a Deep Neural Network makes a decision, it fires every neuron in its active path.
+      It's like searching a library by reading every single book, every single time.
+    </p>
+
+    <div class="cost-bullets">
+      <div class="cost-item">
+        <span class="cost-icon">⏱</span>
+        <div>
+          <strong>High Latency</strong>
+          <p>Waiting for matrix multiplications across dozens of layers.</p>
+        </div>
+      </div>
+      <div class="cost-item">
+        <span class="cost-icon">🔋</span>
+        <div>
+          <strong>Battery Drain</strong>
+          <p>Unsuitable for hearing aids, drones, wearables, and edge devices.</p>
+        </div>
+      </div>
+      <div class="cost-item">
+        <span class="cost-icon">⬛</span>
+        <div>
+          <strong>Black Box</strong>
+          <p>You know <em>what</em> it decided, but never <em>why</em>.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="ticker-grid">
+      <div class="ticker-card ticker-dl">
+        <div class="ticker-icon">🔥</div>
+        <div class="ticker-label">Deep Learning (Global Training)</div>
+        <div class="ticker-value" id="dlEnergy">0</div>
+        <div class="ticker-unit">kWh consumed since you opened this page</div>
+        <div class="ticker-sub">≈ <span id="dlHomes">0</span> US homes for a day</div>
+      </div>
+
+      <div class="ticker-vs">vs</div>
+
+      <div class="ticker-card ticker-rl">
+        <div class="ticker-icon">💡</div>
+        <div class="ticker-label">Rich Learning (Equivalent Task)</div>
+        <div class="ticker-value" id="rlEnergy">0.001</div>
+        <div class="ticker-unit">kWh consumed</div>
+        <div class="ticker-sub">≈ 1 LED blink</div>
+      </div>
+    </div>
+
+    <div class="ticker-footnote">
+      <p>Estimates based on IEA 2025 data center energy reports. Deep Learning training estimated at ~3.5 GW global continuous draw (~30 TWh/year). Rich Learning navigation uses only arithmetic operations on pre-computed embeddings.</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .energy-section {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .cost-bullets {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin: 2.5rem 0 3rem;
+  }
+  .cost-item {
+    display: flex; gap: 0.75rem; align-items: flex-start;
+    padding: 1rem;
+    background: var(--void);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .cost-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 0.1rem; }
+  .cost-item strong { color: var(--text); font-size: 0.95rem; display: block; margin-bottom: 0.25rem; }
+  .cost-item p { color: var(--text-dim); font-size: 0.85rem; line-height: 1.5; margin: 0; }
+  .ticker-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 2rem;
+    align-items: center;
+    margin: 3rem 0;
+  }
+  .ticker-card {
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--void);
+    text-align: center;
+  }
+  .ticker-dl { border-color: rgba(255,68,68,0.3); }
+  .ticker-rl { border-color: rgba(0,255,136,0.3); }
+  .ticker-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+  .ticker-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+  }
+  .ticker-value {
+    font-family: var(--mono);
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .ticker-dl .ticker-value { color: var(--danger); }
+  .ticker-rl .ticker-value { color: var(--accent); }
+  .ticker-unit {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-top: 0.25rem;
+  }
+  .ticker-sub {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-top: 0.5rem;
+    font-style: italic;
+  }
+  .ticker-vs {
+    font-family: var(--mono);
+    font-size: 1.2rem;
+    color: var(--text-dim);
+    font-weight: 700;
+  }
+  .ticker-footnote {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .ticker-footnote p {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    max-width: 700px;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 768px) {
+    .ticker-grid { grid-template-columns: 1fr; }
+    .ticker-vs { text-align: center; }
+    .ticker-value { font-size: 2rem; }
+  }
+</style>
+
+<script>
+  // Global DL training: ~3.5 GW continuous = ~3,500,000 kWh per hour
+  const KWH_PER_SECOND = 3_500_000 / 3600; // ≈ 972 kWh/s
+  const KWH_PER_HOME_PER_DAY = 30; // US average
+
+  const dlEl = document.getElementById('dlEnergy')!;
+  const homesEl = document.getElementById('dlHomes')!;
+  let elapsed = 0;
+
+  function formatNumber(n: number): string {
+    if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
+    if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K';
+    return Math.floor(n).toLocaleString();
+  }
+
+  setInterval(() => {
+    elapsed++;
+    const kwh = KWH_PER_SECOND * elapsed;
+    dlEl.textContent = formatNumber(kwh);
+    homesEl.textContent = formatNumber(kwh / KWH_PER_HOME_PER_DAY);
+  }, 1000);
+</script>

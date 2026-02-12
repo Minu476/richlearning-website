@@ -1,0 +1,145 @@
+---
+/**
+ * Blog Section — "The Engineering Log"
+ * Teaser cards for published and upcoming posts
+ */
+---
+
+<section class="blog-section" id="blog">
+  <div class="section">
+    <p class="section-label">// The Engineering Log</p>
+    <h2 class="section-title">Experiments, Not Marketing</h2>
+    <p class="section-subtitle">
+      We document our experiments with the same rigor we write our code.
+      No hype. Just data.
+    </p>
+
+    <div class="blog-grid">
+      <!-- Published -->
+      <article class="blog-card blog-featured">
+        <div class="blog-tag">Latest</div>
+        <h3 class="blog-title">What If Identity Search Didn't Need Deep Learning?</h3>
+        <p class="blog-excerpt">
+          A four-step graph walk, with zero hidden layers, solved an adversarial
+          doppelgänger trap that stumps deep learning. Energy cost: one LED blink.
+        </p>
+        <div class="blog-meta">
+          <span>February 2026</span>
+          <span>·</span>
+          <span>8 min read</span>
+        </div>
+        <a href="#" class="blog-link">Read the experiment →</a>
+      </article>
+
+      <!-- Coming Soon -->
+      <article class="blog-card">
+        <div class="blog-tag blog-tag-upcoming">Coming Soon</div>
+        <h3 class="blog-title">The 1-Watt Challenge: Chess Without GPUs</h3>
+        <p class="blog-excerpt">
+          Can structured navigation beat a grandmaster-level engine
+          using less energy than a lightbulb?
+        </p>
+        <div class="blog-meta">
+          <span>March 2026</span>
+        </div>
+      </article>
+
+      <article class="blog-card">
+        <div class="blog-tag blog-tag-upcoming">Coming Soon</div>
+        <h3 class="blog-title">Financial Regime Detection Without Retraining</h3>
+        <p class="blog-excerpt">
+          How topological memory lets a trading agent recognize market shifts
+          it has never seen — without forgetting what it already knows.
+        </p>
+        <div class="blog-meta">
+          <span>Q2 2026</span>
+        </div>
+      </article>
+
+      <article class="blog-card">
+        <div class="blog-tag blog-tag-upcoming">Coming Soon</div>
+        <h3 class="blog-title">Medical Triage: Routing Without Neural Networks</h3>
+        <p class="blog-excerpt">
+          A stateful navigation agent that routes emergency patients
+          using structured memory instead of deep classifiers.
+        </p>
+        <div class="blog-meta">
+          <span>Q2 2026</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<style>
+  .blog-section { background: var(--void); }
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  .blog-card {
+    padding: 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    transition: border-color 0.2s;
+  }
+  .blog-card:hover { border-color: var(--accent-dim); }
+  .blog-featured {
+    grid-column: span 2;
+    border-color: rgba(0,255,136,0.2);
+    background:
+      linear-gradient(135deg, rgba(0,255,136,0.03), transparent),
+      var(--surface);
+  }
+  .blog-tag {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    background: var(--accent-glow);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    width: fit-content;
+  }
+  .blog-tag-upcoming {
+    color: var(--text-dim);
+    background: var(--surface-2);
+  }
+  .blog-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--text);
+  }
+  .blog-excerpt {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+  .blog-meta {
+    display: flex;
+    gap: 0.5rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+  .blog-link {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+    margin-top: auto;
+  }
+
+  @media (max-width: 768px) {
+    .blog-grid { grid-template-columns: 1fr; }
+    .blog-featured { grid-column: span 1; }
+  }
+</style>

@@ -1,0 +1,316 @@
+---
+/**
+ * Hero Section — "Intelligence is a Path, Not a Layer"
+ * Interactive graph animation vs heavy neural block
+ */
+---
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <p class="hero-label">Rich Learning</p>
+      <h1 class="hero-title">
+        Intelligence is a <span class="accent">Path</span>,<br />
+        Not a Layer.
+      </h1>
+      <p class="hero-subtitle">
+        Rich Learning replaces heavy compute with structured navigation.<br />
+        <strong>0 Hidden Layers. 1/1000th the Energy.</strong>
+      </p>
+      <div class="hero-cta">
+        <a href="#how-it-works" class="btn btn-primary">See How It Works</a>
+        <a href="https://github.com/RichLearning" class="btn btn-ghost" target="_blank">View on GitHub →</a>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <!-- The Old Way -->
+      <div class="visual-col">
+        <div class="visual-label">The Old Way</div>
+        <div class="neural-block" id="neuralBlock">
+          <div class="layer"></div>
+          <div class="layer"></div>
+          <div class="layer"></div>
+          <div class="layer"></div>
+          <div class="layer"></div>
+          <div class="layer"></div>
+          <div class="heat-overlay"></div>
+          <!-- Criss-cross mesh lines -->
+          <svg class="mesh-lines" viewBox="0 0 140 220" preserveAspectRatio="none">
+            <line x1="20" y1="24" x2="120" y2="56" /><line x1="110" y1="24" x2="30" y2="56" />
+            <line x1="30" y1="56" x2="115" y2="88" /><line x1="120" y1="56" x2="25" y2="88" />
+            <line x1="25" y1="88" x2="110" y2="120" /><line x1="115" y1="88" x2="35" y2="120" />
+            <line x1="35" y1="120" x2="120" y2="152" /><line x1="110" y1="120" x2="20" y2="152" />
+            <line x1="20" y1="152" x2="115" y2="184" /><line x1="120" y1="152" x2="30" y2="184" />
+            <line x1="60" y1="24" x2="80" y2="56" /><line x1="80" y1="24" x2="60" y2="56" />
+            <line x1="60" y1="88" x2="80" y2="120" /><line x1="80" y1="88" x2="60" y2="120" />
+            <line x1="60" y1="152" x2="80" y2="184" /><line x1="80" y1="152" x2="60" y2="184" />
+          </svg>
+        </div>
+        <div class="energy-counter energy-old">
+          Energy: <span id="energyOld">0</span>u
+        </div>
+      </div>
+
+      <!-- Your Way -->
+      <div class="visual-col">
+        <div class="visual-label">Rich Learning</div>
+        <canvas id="graphCanvas" width="280" height="220"></canvas>
+        <div class="energy-counter energy-new">
+          Energy: <span id="energyNew">0</span>u
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    padding: 6rem 2rem 4rem;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(0,255,136,0.04) 0%, transparent 60%),
+      var(--void);
+  }
+  .hero-inner {
+    max-width: 1200px; margin: 0 auto; width: 100%;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 4rem; align-items: center;
+  }
+  .hero-label {
+    font-family: var(--mono); font-size: 0.8rem;
+    color: var(--accent); text-transform: uppercase;
+    letter-spacing: 0.2em; margin-bottom: 1rem;
+  }
+  .hero-title {
+    font-size: 3.2rem; font-weight: 700; line-height: 1.15;
+    margin-bottom: 1.5rem;
+  }
+  .accent { color: var(--accent); }
+  .hero-subtitle {
+    font-size: 1.15rem; color: var(--text-dim);
+    line-height: 1.7; margin-bottom: 2rem;
+  }
+  .hero-subtitle strong { color: var(--text); }
+  .hero-cta { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .btn {
+    padding: 0.75rem 1.5rem; border-radius: 8px;
+    font-weight: 600; font-size: 0.95rem;
+    display: inline-block; transition: all 0.2s;
+  }
+  .btn-primary {
+    background: var(--accent); color: var(--void);
+  }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-ghost {
+    border: 1px solid var(--border); color: var(--text);
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ═══ Visual: Neural Block ═══ */
+  .hero-visual {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  .visual-col {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 0.75rem;
+  }
+  .visual-label {
+    font-family: var(--mono); font-size: 0.7rem;
+    color: var(--text-dim); text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .neural-block {
+    width: 140px; height: 220px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex; flex-direction: column;
+    justify-content: space-evenly;
+    padding: 1rem;
+    position: relative; overflow: hidden;
+  }
+  .layer {
+    height: 16px;
+    background: linear-gradient(90deg, #ff4444, #ff6644);
+    border-radius: 3px;
+    opacity: 0.3;
+    animation: layerPulse 2s ease-in-out infinite;
+  }
+  .layer:nth-child(2) { animation-delay: 0.15s; }
+  .layer:nth-child(3) { animation-delay: 0.3s; }
+  .layer:nth-child(4) { animation-delay: 0.45s; }
+  .layer:nth-child(5) { animation-delay: 0.6s; }
+  .layer:nth-child(6) { animation-delay: 0.75s; }
+  .heat-overlay {
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at center, rgba(255,68,68,0.1), transparent);
+    animation: heatPulse 3s ease-in-out infinite;
+  }
+  .mesh-lines {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+  }
+  .mesh-lines line {
+    stroke: rgba(255,68,68,0.12);
+    stroke-width: 0.8;
+    animation: meshFlicker 4s ease-in-out infinite;
+  }
+  .mesh-lines line:nth-child(odd) { animation-delay: 0.5s; }
+  .mesh-lines line:nth-child(3n) { stroke: rgba(255,100,68,0.08); }
+  @keyframes meshFlicker {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+  @keyframes layerPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.9; }
+  }
+  @keyframes heatPulse {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+  }
+
+  /* ═══ Energy Counters ═══ */
+  .energy-counter {
+    font-family: var(--mono); font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px; border: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .energy-old span { color: var(--danger); }
+  .energy-new span { color: var(--accent); }
+
+  #graphCanvas {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface-2);
+  }
+
+  @media (max-width: 768px) {
+    .hero-inner { grid-template-columns: 1fr; }
+    .hero-title { font-size: 2.2rem; }
+    .hero-visual { display: none; }
+  }
+</style>
+
+<script>
+  // ═══ Graph Canvas Animation ═══
+  const canvas = document.getElementById('graphCanvas') as HTMLCanvasElement;
+  const ctx = canvas.getContext('2d')!;
+
+  interface Node { x: number; y: number; label: string; active: boolean; }
+
+  const nodes: Node[] = [
+    { x: 40, y: 110, label: 'Start', active: false },
+    { x: 90, y: 40, label: '', active: false },
+    { x: 140, y: 150, label: 'Trap', active: false },
+    { x: 180, y: 70, label: '', active: false },
+    { x: 230, y: 180, label: '', active: false },
+    { x: 240, y: 100, label: 'Target', active: false },
+    { x: 100, y: 190, label: '', active: false },
+    { x: 50, y: 50, label: '', active: false },
+  ];
+
+  const edges: [number, number][] = [
+    [0, 1], [0, 2], [1, 3], [2, 0], [3, 5], [2, 6], [4, 5], [6, 4], [7, 0], [1, 7]
+  ];
+
+  // The illuminated path: Start → Trap → (loop back) → alternate → Target
+  const pathStages = [
+    [0],           // Start
+    [0, 2],        // Move to Trap
+    [0, 2, 0],     // Loop detected!
+    [0, 1],        // Backtrack, try alt
+    [0, 1, 3],     // Continue
+    [0, 1, 3, 5],  // TARGET
+  ];
+
+  let currentStage = 0;
+  let frameCount = 0;
+
+  function drawGraph() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const activePath = pathStages[currentStage];
+    const activeEdges = new Set<string>();
+    for (let i = 0; i < activePath.length - 1; i++) {
+      activeEdges.add(`${activePath[i]}-${activePath[i + 1]}`);
+      activeEdges.add(`${activePath[i + 1]}-${activePath[i]}`);
+    }
+
+    // Draw edges
+    for (const [a, b] of edges) {
+      const isActive = activeEdges.has(`${a}-${b}`);
+      ctx.beginPath();
+      ctx.moveTo(nodes[a].x, nodes[a].y);
+      ctx.lineTo(nodes[b].x, nodes[b].y);
+      ctx.strokeStyle = isActive ? '#00ff88' : '#333333';
+      ctx.lineWidth = isActive ? 2 : 1;
+      ctx.stroke();
+    }
+
+    // Draw nodes
+    const activeNodes = new Set(activePath);
+    for (let i = 0; i < nodes.length; i++) {
+      const n = nodes[i];
+      const isActive = activeNodes.has(i);
+      const isTarget = i === 5;
+      const isTrap = i === 2 && currentStage >= 2;
+
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, isActive ? 8 : 5, 0, Math.PI * 2);
+      ctx.fillStyle = isTrap ? '#ff4444'
+        : isTarget && isActive ? '#00ff88'
+        : isActive ? '#00cc6a'
+        : '#444444';
+      ctx.fill();
+
+      if (isActive) {
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, 12, 0, Math.PI * 2);
+        ctx.strokeStyle = isTrap ? 'rgba(255,68,68,0.3)' : 'rgba(0,255,136,0.3)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      if (n.label) {
+        ctx.font = '10px "JetBrains Mono", monospace';
+        ctx.fillStyle = isTrap && currentStage >= 2 ? '#ff4444' : '#888';
+        ctx.textAlign = 'center';
+        ctx.fillText(n.label, n.x, n.y + 22);
+      }
+    }
+  }
+
+  // Energy counters
+  const energyOld = document.getElementById('energyOld')!;
+  const energyNew = document.getElementById('energyNew')!;
+  let oldCount = 0;
+  let newCount = 0;
+
+  function animate() {
+    frameCount++;
+
+    // Advance path every 90 frames (~1.5s at 60fps)
+    if (frameCount % 90 === 0) {
+      currentStage = (currentStage + 1) % pathStages.length;
+      if (currentStage > 0) newCount += 1;
+    }
+
+    // Old energy ticks fast
+    if (frameCount % 3 === 0) {
+      oldCount++;
+      energyOld.textContent = oldCount.toString();
+    }
+    energyNew.textContent = newCount.toString();
+
+    drawGraph();
+    requestAnimationFrame(animate);
+  }
+
+  drawGraph();
+  requestAnimationFrame(animate);
+</script>

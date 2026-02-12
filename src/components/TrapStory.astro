@@ -1,0 +1,215 @@
+---
+/**
+ * Trap Story Section — "Smarter Than a Neural Net"
+ * Mini step-by-step animation of the Doppelgänger Trap scenario
+ */
+---
+
+<section class="trap-section" id="trap-story">
+  <div class="section">
+    <p class="section-label">// The Proof</p>
+    <h2 class="section-title">Smarter Than a Neural Net</h2>
+    <p class="section-subtitle">
+      We trapped a Deep Learning agent and a Rich Learning agent in a visual loop —
+      a "Doppelgänger Trap." Only one escaped.
+    </p>
+
+    <div class="trap-grid">
+      <!-- Deep Learning side -->
+      <div class="trap-card trap-dl">
+        <div class="trap-header">
+          <span class="trap-badge trap-badge-dl">Deep Learning</span>
+          <span class="trap-verdict trap-verdict-fail">FAILED</span>
+        </div>
+        <div class="trap-steps">
+          <div class="trap-step">
+            <span class="step-num">1</span>
+            <span class="step-text">Finds Trap (99.97% similarity) → commits immediately</span>
+          </div>
+          <div class="trap-step">
+            <span class="step-num">2</span>
+            <span class="step-text">Trap loops back to start</span>
+          </div>
+          <div class="trap-step">
+            <span class="step-num">3</span>
+            <span class="step-text">Finds Trap again (99.97% — still the best match!)</span>
+          </div>
+          <div class="trap-step trap-step-loop">
+            <span class="step-num">∞</span>
+            <span class="step-text">Spins in circles forever, confident it's right.</span>
+          </div>
+        </div>
+        <div class="trap-footer">
+          <div class="trap-stat">
+            <span class="trap-stat-label">Result</span>
+            <span class="trap-stat-value trap-stat-fail">Wrong answer, 99.97% confidence</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rich Learning side -->
+      <div class="trap-card trap-rl">
+        <div class="trap-header">
+          <span class="trap-badge trap-badge-rl">Rich Learning</span>
+          <span class="trap-verdict trap-verdict-pass">ESCAPED</span>
+        </div>
+        <div class="trap-steps">
+          <div class="trap-step">
+            <span class="step-num step-num-rl">1</span>
+            <span class="step-text">Finds Trap (99.97% similarity) → moves toward it</span>
+          </div>
+          <div class="trap-step">
+            <span class="step-num step-num-rl">2</span>
+            <span class="step-text">Trap loops back → <strong>recognizes the loop</strong></span>
+          </div>
+          <div class="trap-step trap-step-key">
+            <span class="step-num step-num-rl">3</span>
+            <span class="step-text">Marks Trap as poison. Penalizes the path that led there.</span>
+          </div>
+          <div class="trap-step trap-step-success">
+            <span class="step-num step-num-rl">4</span>
+            <span class="step-text">Takes alternate route → <strong>finds real target</strong></span>
+          </div>
+        </div>
+        <div class="trap-footer">
+          <div class="trap-stat">
+            <span class="trap-stat-label">Result</span>
+            <span class="trap-stat-value trap-stat-pass">Right answer in 4 steps</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="trap-takeaway">
+      <blockquote>
+        Intelligence isn't just pattern matching. It's knowing where you've been.
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<style>
+  .trap-section {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .trap-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin: 3rem 0;
+  }
+  .trap-card {
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--void);
+    overflow: hidden;
+  }
+  .trap-dl { border-color: rgba(255,68,68,0.25); }
+  .trap-rl { border-color: rgba(0,255,136,0.25); }
+  .trap-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .trap-badge {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .trap-badge-dl { background: rgba(255,68,68,0.15); color: var(--danger); }
+  .trap-badge-rl { background: var(--accent-glow); color: var(--accent); }
+  .trap-verdict {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .trap-verdict-fail { color: var(--danger); }
+  .trap-verdict-pass { color: var(--accent); }
+
+  .trap-steps { padding: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; }
+  .trap-step {
+    display: flex; align-items: flex-start; gap: 0.75rem;
+    font-size: 0.9rem; color: var(--text-dim); line-height: 1.5;
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: rgba(255,68,68,0.15);
+    color: var(--danger);
+  }
+  .step-num-rl {
+    background: var(--accent-glow);
+    color: var(--accent);
+  }
+  .step-text strong { color: var(--text); }
+  .trap-step-loop {
+    padding: 0.5rem 0.75rem;
+    background: rgba(255,68,68,0.05);
+    border-radius: 6px;
+    border: 1px dashed rgba(255,68,68,0.2);
+  }
+  .trap-step-key {
+    padding: 0.5rem 0.75rem;
+    background: rgba(0,255,136,0.03);
+    border-radius: 6px;
+    border: 1px solid rgba(0,255,136,0.15);
+  }
+  .trap-step-success {
+    padding: 0.5rem 0.75rem;
+    background: rgba(0,255,136,0.05);
+    border-radius: 6px;
+  }
+
+  .trap-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .trap-stat-label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+  .trap-stat-value {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .trap-stat-fail { color: var(--danger); }
+  .trap-stat-pass { color: var(--accent); }
+
+  .trap-takeaway {
+    margin-top: 2rem;
+    padding: 1.5rem 2rem;
+    border-left: 3px solid var(--accent);
+    background: var(--accent-glow);
+    border-radius: 0 8px 8px 0;
+  }
+  .trap-takeaway blockquote {
+    font-size: 1.15rem;
+    font-weight: 500;
+    font-style: italic;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  @media (max-width: 768px) {
+    .trap-grid { grid-template-columns: 1fr; }
+  }
+</style>

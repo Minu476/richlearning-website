@@ -1,0 +1,262 @@
+---
+/**
+ * Green Benchmark Section — Hard-hitting bar chart comparison
+ */
+---
+
+<section class="benchmark-section" id="benchmark">
+  <div class="section">
+    <p class="section-label">// The Numbers</p>
+    <h2 class="section-title">The Green Benchmark</h2>
+    <p class="section-subtitle">
+      Run on a battery. Run on a watch. Run on 2020 hardware.
+    </p>
+
+    <div class="bench-grid">
+      <!-- Training Energy -->
+      <div class="bench-card">
+        <h3 class="bench-title">Training / Setup Energy</h3>
+        <div class="bar-group">
+          <div class="bar-item">
+            <div class="bar-label">ResNet-50 Training</div>
+            <div class="bar-track">
+              <div class="bar-fill bar-dl" style="width: 100%;">
+                <span>~300 kWh</span>
+              </div>
+            </div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-label">Re-ranking Head</div>
+            <div class="bar-track">
+              <div class="bar-fill bar-dl-mid" style="width: 18%;">
+                <span>~50 kWh</span>
+              </div>
+            </div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-label">Rich Learning Navigation</div>
+            <div class="bar-track">
+              <div class="bar-fill bar-rl" style="width: 0.5%;">
+              </div>
+              <span class="bar-label-outside">0 kWh</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inference Latency -->
+      <div class="bench-card">
+        <h3 class="bench-title">Per-Query Latency (Decision Layer)</h3>
+        <div class="bar-group">
+          <div class="bar-item">
+            <div class="bar-label">Deep Re-ranking (GPU)</div>
+            <div class="bar-track">
+              <div class="bar-fill bar-dl" style="width: 100%;">
+                <span>5–15 ms</span>
+              </div>
+            </div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-label">Deep Re-ranking (CPU)</div>
+            <div class="bar-track">
+              <div class="bar-fill bar-dl-mid" style="width: 75%;">
+                <span>50–200 ms</span>
+              </div>
+            </div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-label">Rich Learning Navigation</div>
+            <div class="bar-track">
+              <div class="bar-fill bar-rl" style="width: 5%;">
+              </div>
+              <span class="bar-label-outside">0.1–2 ms</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Annual CO₂ at Scale -->
+      <div class="bench-card">
+        <h3 class="bench-title">Annual CO₂ (100K queries/day, decision layer only)</h3>
+        <div class="bar-group">
+          <div class="bar-item">
+            <div class="bar-label">Deep Re-ranking Pipeline</div>
+            <div class="bar-track">
+              <div class="bar-fill bar-dl" style="width: 100%;">
+                <span>~2,000 kg CO₂</span>
+              </div>
+            </div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-label">Rich Learning Navigation</div>
+            <div class="bar-track">
+              <div class="bar-fill bar-rl" style="width: 1%;">
+              </div>
+              <span class="bar-label-outside">~2 kg CO₂</span>
+            </div>
+          </div>
+        </div>
+        <div class="bench-reduction">
+          1,000× reduction
+        </div>
+      </div>
+    </div>
+
+      <!-- Retention / Catastrophic Forgetting -->
+      <div class="bench-card">
+        <h3 class="bench-title">Retention After Learning 5 Tasks (Split-MNIST)</h3>
+        <div class="bar-group">
+          <div class="bar-item">
+            <div class="bar-label">Deep MLP — Task 1 accuracy after training Task 5</div>
+            <div class="bar-track">
+              <div class="bar-fill bar-dl" style="width: 0%;">
+              </div>
+              <span class="bar-label-outside bar-label-fail">≈ 0% (catastrophic forgetting)</span>
+            </div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-label">Rich Learning — Task 1 accuracy after Task 5</div>
+            <div class="bar-track">
+              <div class="bar-fill bar-rl" style="width: 100%;">
+                <span>100%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bench-reduction">
+          Zero forgetting, by design
+        </div>
+      </div>
+    </div>
+
+    <!-- Hardware Requirement -->
+    <div class="hardware-strip">
+      <div class="hw-item">
+        <div class="hw-icon">🖥️</div>
+        <div class="hw-text">
+          <strong>Deep Learning</strong>
+          <span>Requires GPU (A100/H100), ~$2–10/hr cloud</span>
+        </div>
+      </div>
+      <div class="hw-divider"></div>
+      <div class="hw-item">
+        <div class="hw-icon">⌚</div>
+        <div class="hw-text">
+          <strong>Rich Learning</strong>
+          <span>Runs on any CPU. Even a smartwatch.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .benchmark-section {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .bench-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin: 3rem 0;
+  }
+  .bench-card {
+    padding: 2rem;
+    background: var(--void);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  .bench-title {
+    font-size: 0.85rem;
+    font-family: var(--mono);
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1.5rem;
+  }
+  .bar-group { display: flex; flex-direction: column; gap: 1rem; }
+  .bar-item { }
+  .bar-label {
+    font-size: 0.85rem;
+    color: var(--text);
+    margin-bottom: 0.35rem;
+  }
+  .bar-track {
+    height: 32px;
+    background: var(--surface-2);
+    border-radius: 6px;
+    overflow: visible;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 0.75rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--void);
+    min-width: fit-content;
+    transition: width 1s ease;
+  }
+  .bar-dl { background: linear-gradient(90deg, #ff4444, #ff6644); }
+  .bar-dl-mid { background: linear-gradient(90deg, #ff8844, #ffaa44); }
+  .bar-rl { background: linear-gradient(90deg, #00cc6a, #00ff88); min-width: 4px; }
+  .bar-label-outside {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--accent);
+    margin-left: 0.5rem;
+    white-space: nowrap;
+  }
+  .bar-label-fail {
+    color: var(--danger);
+  }
+  .bench-reduction {
+    margin-top: 1rem;
+    text-align: right;
+    font-family: var(--mono);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  /* ═══ Hardware Strip ═══ */
+  .hardware-strip {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 1.5rem 2rem;
+    background: var(--void);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-top: 2rem;
+  }
+  .hw-item {
+    flex: 1;
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .hw-icon { font-size: 2rem; }
+  .hw-text {
+    display: flex; flex-direction: column;
+    font-size: 0.9rem;
+  }
+  .hw-text strong { color: var(--text); margin-bottom: 0.15rem; }
+  .hw-text span { color: var(--text-dim); font-size: 0.8rem; }
+  .hw-divider {
+    width: 1px; height: 40px;
+    background: var(--border);
+  }
+
+  @media (max-width: 768px) {
+    .hardware-strip { flex-direction: column; }
+    .hw-divider { width: 100%; height: 1px; }
+  }
+</style>
