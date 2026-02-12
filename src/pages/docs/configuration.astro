@@ -1,0 +1,179 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="Configuration" activeSlug="configuration">
+  <h1>Configuration</h1>
+  <p>
+    Rich Learning supports two storage backends and several tuneable parameters 
+    that control exploration, novelty detection, and experience replay.
+  </p>
+
+  <h2>Storage Backends</h2>
+
+  <h3>LiteDB (Embedded — Default)</h3>
+  <p>
+    Zero-configuration embedded database. Data stored in a single file. 
+    Best for local experimentation, CI pipelines, and environments where 
+    you can't run a database server.
+  </p>
+  <pre><code>dotnet run -- SplitMnist --litedb</code></pre>
+  <p>
+    <strong>Pros:</strong> No setup, no external dependencies, fast startup, portable.<br />
+    <strong>Cons:</strong> No graph visualisation UI, in-process BFS for path queries.
+  </p>
+
+  <h3>Neo4j (Server)</h3>
+  <p>
+    Full graph database with Cypher query language and browser-based visualisation.
+    Best for production, large state spaces, and when you want to visually inspect the topology.
+  </p>
+  <pre><code># Environment variables
+export NEO4J_URI=bolt://localhost:7687
+export NEO4J_USER=neo4j
+export NEO4J_PASSWORD=richlearning
+
+# Run without --litedb flag
+dotnet run -- SplitMnist</code></pre>
+
+  <p><strong>Quick start with Docker:</strong></p>
+  <pre><code>docker run -d --name neo4j \
+  -p 7474:7474 -p 7687:7687 \
+  -e NEO4J_AUTH=neo4j/richlearning \
+  -v neo4j_data:/data \
+  neo4j:5</code></pre>
+  <p>
+    Then open <code>http://localhost:7474</code> to explore the graph visually.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th>LiteDB</th>
+        <th>Neo4j</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Setup</td>
+        <td>Zero-config</td>
+        <td>Server required</td>
+      </tr>
+      <tr>
+        <td>Path queries</td>
+        <td>In-process BFS</td>
+        <td>Cypher <code>shortestPath()</code></td>
+      </tr>
+      <tr>
+        <td>Visualisation</td>
+        <td>None</td>
+        <td>Neo4j Browser</td>
+      </tr>
+      <tr>
+        <td>Bottleneck analysis</td>
+        <td>Not available</td>
+        <td><code>GetBottleneckLandmarksAsync()</code></td>
+      </tr>
+      <tr>
+        <td>Stale node queries</td>
+        <td>Not available</td>
+        <td><code>GetStaleLandmarksAsync()</code></td>
+      </tr>
+      <tr>
+        <td>Cluster statistics</td>
+        <td>Not available</td>
+        <td><code>GetClusterStatsAsync()</code></td>
+      </tr>
+      <tr>
+        <td>Deployment</td>
+        <td>Single file</td>
+        <td>Docker / VM / Cloud</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Cartographer Parameters</h2>
+  <p>
+    The <code>Cartographer</code> planner exposes several tuneable properties:
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Parameter</th>
+        <th>Default</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>NoveltyThreshold</code></td>
+        <td>0.3</td>
+        <td>Minimum cosine distance to nearest landmark before a new landmark is created. Lower = more landmarks, finer resolution.</td>
+      </tr>
+      <tr>
+        <td><code>ValueEmaAlpha</code></td>
+        <td>0.1</td>
+        <td>Exponential moving average smoothing factor for landmark value estimates.</td>
+      </tr>
+      <tr>
+        <td><code>NoveltyDecayRate</code></td>
+        <td>0.05</td>
+        <td>Rate at which novelty score decays per visit. Higher = novelty fades faster.</td>
+      </tr>
+      <tr>
+        <td><code>TrajectoryWindowSize</code></td>
+        <td>20</td>
+        <td>Number of recent landmarks kept for loop detection. Larger window catches longer cycles.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Tuning Guidelines</h3>
+  <ul>
+    <li><strong>Dense state spaces</strong> (e.g., pixel observations): Lower <code>NoveltyThreshold</code> to ~0.1 for finer discretisation</li>
+    <li><strong>Sparse state spaces</strong> (e.g., grid worlds): Raise <code>NoveltyThreshold</code> to ~0.5 to avoid redundant landmarks</li>
+    <li><strong>Long episodes</strong>: Increase <code>TrajectoryWindowSize</code> to 50+ for better cycle detection</li>
+    <li><strong>Volatile rewards</strong>: Lower <code>ValueEmaAlpha</code> to ~0.05 for smoother value estimates</li>
+  </ul>
+
+  <h2>Replay Scoring</h2>
+  <p>
+    Prioritised experience replay ranks transitions using:
+  </p>
+  <pre><code>priority = (|TdError| + ε) / (TransitionCount + 1) × staleness</code></pre>
+  <p>Where:</p>
+  <ul>
+    <li><code>ε = 0.01</code> — ensures minimum priority for all transitions</li>
+    <li><code>staleness = currentTimestep - LastTrainedTimestep</code> — favours under-trained transitions</li>
+    <li><code>TransitionCount</code> — normalises priority by experience</li>
+  </ul>
+
+  <h2>Frontier Scoring</h2>
+  <p>
+    Frontier landmarks are ranked for exploration:
+  </p>
+  <pre><code>score = NoveltyScore / (1 + VisitCount) × 1 / (1 + OutDegree)</code></pre>
+  <p>
+    High-novelty, low-visit, low-connectivity nodes are prioritised — 
+    they represent the boundary of the known map.
+  </p>
+
+  <h2>State Encoder</h2>
+  <p>
+    The <code>IStateEncoder</code> interface converts raw observations into fixed-length 
+    embeddings for nearest-neighbour comparison:
+  </p>
+  <pre><code>public interface IStateEncoder
+&#123;
+    int EmbeddingDimension &#123; get; &#125;
+    double[] Encode(double[] rawState);
+    double Distance(double[] a, double[] b); // default: cosine
+&#125;</code></pre>
+  <p>
+    The default <code>DefaultStateEncoder</code> is an identity encoder with 64-dimensional 
+    output and cosine distance. For domain-specific applications, implement this interface 
+    with a proper feature extractor (e.g., PCA, random projection, or a frozen pretrained encoder).
+  </p>
+</DocsLayout>

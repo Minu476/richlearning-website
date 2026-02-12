@@ -1,0 +1,142 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+const base = import.meta.env.BASE_URL;
+---
+
+<DocsLayout title="Documentation" activeSlug="">
+  <h1>Rich Learning Documentation</h1>
+  <p class="lead">
+    Rich Learning is a reinforcement learning paradigm that replaces mutable weight matrices 
+    with a navigable <strong>Topological Graph Memory</strong>. No hidden layers. No gradient 
+    descent. Just structured navigation over a persistent knowledge graph.
+  </p>
+
+  <hr />
+
+  <h2>Why Rich Learning?</h2>
+  <p>
+    Traditional deep RL suffers from <strong>catastrophic forgetting</strong> — learn a new task, 
+    lose the old one. Rich Learning solves this by encoding knowledge as graph topology rather 
+    than neural weights. Every learned state is preserved as an immutable node. 
+    The result: <strong>100% retention</strong> across sequential tasks.
+  </p>
+
+  <blockquote>
+    <p>100% knowledge retention. Zero hidden layers. One graph.</p>
+  </blockquote>
+
+  <h2>Key Results</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Benchmark</th>
+        <th>Method</th>
+        <th>Retention</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Split-MNIST</td>
+        <td>Bare MLP</td>
+        <td>0.0%</td>
+      </tr>
+      <tr>
+        <td>Split-MNIST</td>
+        <td>EWC (λ=100)</td>
+        <td>19.5%</td>
+      </tr>
+      <tr>
+        <td>Split-MNIST</td>
+        <td><strong>Topological Memory</strong></td>
+        <td><strong>100.0%</strong></td>
+      </tr>
+      <tr>
+        <td>Split-Audio (FSD50K)</td>
+        <td><strong>Topological Memory</strong></td>
+        <td><strong>100.0%</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Documentation Sections</h2>
+
+  <div class="card-grid">
+    <a href={`${base}docs/getting-started/`} class="doc-card">
+      <h3>🚀 Getting Started</h3>
+      <p>Install, configure, and run your first Rich Learning agent in under 5 minutes.</p>
+    </a>
+    <a href={`${base}docs/architecture/`} class="doc-card">
+      <h3>🏗 Architecture</h3>
+      <p>How Topological Graph Memory, the Cartographer planner, and exploration strategies work.</p>
+    </a>
+    <a href={`${base}docs/configuration/`} class="doc-card">
+      <h3>⚙️ Configuration</h3>
+      <p>Choose between LiteDB (embedded) and Neo4j (server) backends, and tune parameters.</p>
+    </a>
+    <a href={`${base}docs/api-reference/`} class="doc-card">
+      <h3>📖 API Reference</h3>
+      <p>Complete interface and model reference for IGraphMemory, IStateEncoder, and more.</p>
+    </a>
+  </div>
+
+  <h2>Quick Links</h2>
+  <ul>
+    <li><a href="https://github.com/Minu476/rich-learning" target="_blank">GitHub Repository</a></li>
+    <li><a href="https://doi.org/10.5281/zenodo.18565288" target="_blank">Paper (DOI: 10.5281/zenodo.18565288)</a></li>
+    <li><a href="https://github.com/Minu476/rich-learning/blob/main/CONTRIBUTING.md" target="_blank">Contributing Guide</a></li>
+    <li><a href="https://github.com/Minu476/rich-learning/blob/main/LICENSE" target="_blank">License (Apache 2.0)</a></li>
+  </ul>
+</DocsLayout>
+
+<style>
+  .lead {
+    font-size: 1.15rem;
+    color: var(--text) !important;
+    line-height: 1.8;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin: 1.5rem 0 2rem;
+  }
+
+  .doc-card {
+    display: block;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    transition: all 0.2s;
+    color: var(--text);
+  }
+
+  .doc-card:hover {
+    border-color: var(--accent);
+    background: var(--surface-2);
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+
+  .doc-card h3 {
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
+    color: var(--text) !important;
+    border: none !important;
+    padding: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  .doc-card p {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 600px) {
+    .card-grid { grid-template-columns: 1fr; }
+  }
+</style>

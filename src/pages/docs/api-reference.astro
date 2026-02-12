@@ -1,0 +1,308 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="API Reference" activeSlug="api-reference">
+  <h1>API Reference</h1>
+  <p>
+    Complete reference for all public interfaces, models, and services in the 
+    <code>RichLearning</code> namespace. The library targets <strong>.NET 10</strong> 
+    with nullable reference types enabled.
+  </p>
+
+  <h2>Abstractions</h2>
+
+  <h3>IGraphMemory</h3>
+  <p>
+    Core interface for the topological graph store. Implemented by <code>LiteDbGraphMemory</code> 
+    and <code>Neo4jGraphMemory</code>. Extends <code>IAsyncDisposable</code>.
+  </p>
+  <pre><code>namespace RichLearning.Abstractions;
+
+public interface IGraphMemory : IAsyncDisposable
+&#123;
+    // Schema
+    Task InitialiseSchemaAsync();
+
+    // Node Operations
+    Task UpsertLandmarkAsync(StateLandmark landmark);
+    Task&lt;StateLandmark?&gt; GetLandmarkAsync(string id);
+    Task&lt;IReadOnlyList&lt;StateLandmark&gt;&gt; GetAllLandmarksAsync();
+    Task&lt;(StateLandmark Landmark, double Distance)?&gt;
+        NearestNeighbourAsync(double[] embedding, IStateEncoder encoder);
+
+    // Edge Operations
+    Task UpsertTransitionAsync(StateTransition transition);
+    Task&lt;IReadOnlyList&lt;StateTransition&gt;&gt;
+        GetOutgoingTransitionsAsync(string landmarkId);
+
+    // Graph Queries
+    Task&lt;IReadOnlyList&lt;string&gt;&gt; ShortestPathAsync(
+        string fromId, string toId);
+    Task&lt;IReadOnlyList&lt;string&gt;&gt; DetectCycleInTrajectoryAsync(
+        IReadOnlyList&lt;string&gt; recentIds);
+    Task&lt;IReadOnlyList&lt;StateLandmark&gt;&gt; GetFrontierLandmarksAsync(
+        int topK = 5);
+    Task&lt;IReadOnlyList&lt;StateTransition&gt;&gt; PrioritisedSampleAsync(
+        int batchSize, long currentTimestep);
+
+    // Graph Maintenance
+    Task AssignClustersAsync(int rounds = 5);
+    Task&lt;(int Landmarks, int Transitions)&gt; GetGraphStatsAsync();
+&#125;</code></pre>
+
+  <h3>IStateEncoder</h3>
+  <p>
+    Converts raw state observations into fixed-length vector embeddings 
+    for nearest-neighbour distance computation.
+  </p>
+  <pre><code>namespace RichLearning.Abstractions;
+
+public interface IStateEncoder
+&#123;
+    int EmbeddingDimension &#123; get; &#125;
+    double[] Encode(double[] rawState);
+
+    // Default: pattern-match object → double[]
+    double[] Encode(object rawState);
+
+    // Default: cosine distance
+    double Distance(double[] a, double[] b);
+&#125;</code></pre>
+
+  <h3>Exploration Strategies</h3>
+  <p>Four injectable strategy interfaces for customising exploration behaviour:</p>
+
+  <pre><code>// Score frontier landmarks for exploration priority
+public interface IFrontierScorer
+&#123;
+    double Score(double noveltyScore, int visitCount, int outDegree);
+&#125;
+
+// Decide if an observation warrants a new landmark
+public interface INoveltyGate
+&#123;
+    bool ShouldCreateLandmark(double distanceToNearest);
+&#125;
+
+// Compute replay buffer priority
+public interface IPrioritySampler
+&#123;
+    double ComputePriority(
+        double tdError, int transitionCount, long staleness);
+&#125;
+
+// Escape from detected trajectory loops
+public interface ILoopEscapeStrategy
+&#123;
+    Task&lt;SubgoalDirective?&gt; SelectEscapeTargetAsync(
+        IReadOnlyList&lt;string&gt; cycleNodeIds,
+        IReadOnlyList&lt;StateLandmark&gt; frontiers,
+        IGraphMemory memory,
+        string currentLandmarkId);
+&#125;</code></pre>
+
+  <hr />
+
+  <h2>Models</h2>
+
+  <h3>StateLandmark</h3>
+  <p>Sealed record — represents a graph node (mapped state).</p>
+  <pre><code>namespace RichLearning.Models;
+
+public sealed record StateLandmark
+&#123;
+    public required string Id &#123; get; init; &#125;
+    public required double[] Embedding &#123; get; init; &#125;
+    public int VisitCount &#123; get; set; &#125;
+    public double ValueEstimate &#123; get; set; &#125;
+    public double NoveltyScore &#123; get; set; &#125; = 1.0;
+    public double UncertaintyScore &#123; get; set; &#125; = 1.0;
+    public int ClusterId &#123; get; set; &#125;
+    public int HierarchyLevel &#123; get; set; &#125;
+    public IReadOnlyList&lt;string&gt; ChildNodeIds &#123; get; init; &#125;
+    public long LastVisitedTimestep &#123; get; set; &#125;
+    public long CreatedTimestep &#123; get; init; &#125;
+    public Dictionary&lt;int, int&gt; ActionCounts &#123; get; init; &#125;
+
+    // Computed
+    public IReadOnlyDictionary&lt;int, double&gt; GetPolicyDistribution();
+    public double PolicyEntropy &#123; get; &#125;  // Shannon entropy
+
+    // Episodic memory
+    public List&lt;EpisodicTrace&gt; EpisodicTraces &#123; get; init; &#125;
+    public const int MaxEpisodicTraces = 10;
+&#125;</code></pre>
+
+  <h3>StateTransition</h3>
+  <p>Sealed record — represents a directed graph edge between two landmarks.</p>
+  <pre><code>namespace RichLearning.Models;
+
+public sealed record StateTransition
+&#123;
+    public required string SourceId &#123; get; init; &#125;
+    public required string TargetId &#123; get; init; &#125;
+    public required int Action &#123; get; init; &#125;
+    public Dictionary&lt;int, int&gt; ActionCounts &#123; get; init; &#125;
+    public double Reward &#123; get; set; &#125;
+    public double RewardVariance &#123; get; set; &#125;
+    public int TransitionCount &#123; get; set; &#125; = 1;
+    public double SuccessRate &#123; get; set; &#125; = 1.0;
+    public double Confidence &#123; get; set; &#125; = 0.5;
+    public int TemporalDistance &#123; get; set; &#125; = 1;
+    public double TdError &#123; get; set; &#125;
+    public long LastTrainedTimestep &#123; get; set; &#125;
+    public bool IsMacroEdge &#123; get; init; &#125;
+    public IReadOnlyList&lt;string&gt; MacroPath &#123; get; init; &#125;
+&#125;</code></pre>
+
+  <h3>SubgoalDirective</h3>
+  <p>Sealed record — navigation target issued by the Cartographer.</p>
+  <pre><code>public sealed record SubgoalDirective
+&#123;
+    public required string TargetLandmarkId &#123; get; init; &#125;
+    public string Reason &#123; get; init; &#125; = string.Empty;
+    public IReadOnlyList&lt;string&gt; PlannedPath &#123; get; init; &#125;
+&#125;</code></pre>
+
+  <h3>MapSnapshot</h3>
+  <p>Sealed record — point-in-time statistics of the full graph.</p>
+  <pre><code>public sealed record MapSnapshot
+&#123;
+    public int TotalLandmarks &#123; get; init; &#125;
+    public int TotalTransitions &#123; get; init; &#125;
+    public double MeanVisitCount &#123; get; init; &#125;
+    public double MeanNoveltyScore &#123; get; init; &#125;
+    public int ClusterCount &#123; get; init; &#125;
+    public IReadOnlyDictionary&lt;int, ClusterStats&gt; Clusters &#123; get; init; &#125;
+    public IReadOnlyList&lt;StateLandmark&gt; FrontierNodes &#123; get; init; &#125;
+    public IReadOnlyList&lt;StateLandmark&gt; BottleneckNodes &#123; get; init; &#125;
+    public IReadOnlyList&lt;StateLandmark&gt; StaleNodes &#123; get; init; &#125;
+    public long Timestep &#123; get; init; &#125;
+&#125;</code></pre>
+
+  <hr />
+
+  <h2>Planning</h2>
+
+  <h3>Cartographer</h3>
+  <p>Sealed class — mid-level planner that reads/writes the topological graph.</p>
+  <pre><code>namespace RichLearning.Planning;
+
+public sealed class Cartographer
+&#123;
+    // Constructor
+    public Cartographer(
+        IGraphMemory memory,
+        IStateEncoder encoder,
+        ILogger&lt;Cartographer&gt; logger);
+
+    // Tuneable properties
+    public double NoveltyThreshold &#123; get; set; &#125; = 0.3;
+    public double ValueEmaAlpha &#123; get; set; &#125; = 0.1;
+    public double NoveltyDecayRate &#123; get; set; &#125; = 0.05;
+    public int TrajectoryWindowSize &#123; get; set; &#125; = 20;
+
+    // Observe a raw state → returns landmark ID
+    public Task&lt;string&gt; ObserveStateAsync(
+        double[] rawState, double reward = 0.0);
+
+    // Record a transition between landmarks
+    public Task RecordTransitionAsync(
+        string fromId, string toId, int action,
+        double reward, int primitiveSteps, bool success);
+
+    // Detect loops and return escape subgoal
+    public Task&lt;SubgoalDirective?&gt; DetectAndBreakLoopAsync();
+
+    // Select next exploration/exploitation target
+    public Task&lt;SubgoalDirective?&gt; SelectNextSubgoalAsync(
+        string currentLandmarkId);
+
+    // Get prioritised replay batch
+    public Task&lt;IReadOnlyList&lt;StateTransition&gt;&gt; GetReplayBatchAsync(
+        int batchSize = 32);
+
+    // Human-readable map summary
+    public Task&lt;string&gt; GetMapSummaryAsync();
+&#125;</code></pre>
+
+  <hr />
+
+  <h2>Memory Implementations</h2>
+
+  <h3>LiteDbGraphMemory</h3>
+  <p>
+    Embedded single-file backend. No external server needed. Uses in-process BFS for path 
+    queries and label propagation for cluster assignment.
+  </p>
+  <pre><code>namespace RichLearning.Memory;
+
+public sealed class LiteDbGraphMemory : IGraphMemory
+&#123;
+    public LiteDbGraphMemory(
+        string dbPath,
+        ILogger&lt;LiteDbGraphMemory&gt; logger);
+&#125;</code></pre>
+
+  <h3>Neo4jGraphMemory</h3>
+  <p>
+    Server-based backend using <code>Neo4j.Driver 6.0</code>. Leverages native Cypher for 
+    path finding, cycle detection, and cluster statistics. Adds extra analytical methods 
+    not in the base interface:
+  </p>
+  <pre><code>namespace RichLearning.Memory;
+
+public sealed class Neo4jGraphMemory : IGraphMemory
+&#123;
+    public Neo4jGraphMemory(
+        string uri, string user, string password,
+        ILogger&lt;Neo4jGraphMemory&gt; logger,
+        string database = "neo4j");
+
+    // Neo4j-only extensions
+    public Task&lt;IReadOnlyList&lt;StateLandmark&gt;&gt;
+        GetStaleLandmarksAsync(long staleThreshold, int topK = 10);
+
+    public Task&lt;IReadOnlyList&lt;StateLandmark&gt;&gt;
+        GetBottleneckLandmarksAsync(int topK = 5);
+
+    public Task&lt;IReadOnlyDictionary&lt;int, ClusterStats&gt;&gt;
+        GetClusterStatsAsync();
+&#125;</code></pre>
+
+  <hr />
+
+  <h2>Package Dependencies</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Package</th>
+        <th>Version</th>
+        <th>Purpose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>LiteDB</code></td>
+        <td>5.0.21</td>
+        <td>Embedded NoSQL database</td>
+      </tr>
+      <tr>
+        <td><code>Neo4j.Driver</code></td>
+        <td>6.0.0</td>
+        <td>Official Neo4j .NET driver</td>
+      </tr>
+      <tr>
+        <td><code>Microsoft.Extensions.Logging</code></td>
+        <td>10.0.2</td>
+        <td>Structured logging</td>
+      </tr>
+      <tr>
+        <td><code>Microsoft.Extensions.Logging.Console</code></td>
+        <td>10.0.2</td>
+        <td>Console log output</td>
+      </tr>
+    </tbody>
+  </table>
+</DocsLayout>

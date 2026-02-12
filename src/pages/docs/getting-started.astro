@@ -1,0 +1,102 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="Getting Started" activeSlug="getting-started">
+  <h1>Getting Started</h1>
+  <p>
+    Get Rich Learning running on your machine in under 5 minutes. 
+    Choose between the embedded <strong>LiteDB</strong> backend (zero setup) or 
+    the <strong>Neo4j</strong> backend (server-based, with graph visualisation).
+  </p>
+
+  <h2>Prerequisites</h2>
+  <ul>
+    <li><a href="https://dotnet.microsoft.com/download" target="_blank">.NET 10 SDK</a> or later</li>
+    <li>Git</li>
+    <li><em>Optional:</em> <a href="https://neo4j.com/download/" target="_blank">Neo4j 5+</a> (only if using the Neo4j backend)</li>
+  </ul>
+
+  <h2>Install</h2>
+  <pre><code>git clone https://github.com/Minu476/rich-learning.git
+cd rich-learning
+dotnet restore
+dotnet build</code></pre>
+
+  <h2>Run Your First Benchmark</h2>
+  <p>
+    The fastest way to see Rich Learning in action is the <strong>Split-MNIST</strong> benchmark 
+    with the embedded LiteDB backend:
+  </p>
+  <pre><code>dotnet run -- SplitMnist --litedb</code></pre>
+  <p>
+    This trains on 5 sequential digit pairs (0/1, 2/3, 4/5, 6/7, 8/9), then tests 
+    retention on all previous tasks. Expected result: <strong>100% retention</strong>.
+  </p>
+
+  <h2>Available Commands</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Command</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>SplitMnist --litedb</code></td>
+        <td>Run Split-MNIST continual learning benchmark</td>
+      </tr>
+      <tr>
+        <td><code>SplitAudio --litedb</code></td>
+        <td>Run Split-Audio (FSD50K) benchmark</td>
+      </tr>
+      <tr>
+        <td><code>Compare</code></td>
+        <td>Run Split-MNIST on both backends, print timing comparison</td>
+      </tr>
+      <tr>
+        <td><code>Benchmark</code></td>
+        <td>Performance benchmark (cosine distance, matmul, MLP step)</td>
+      </tr>
+      <tr>
+        <td><code>Demo --litedb</code></td>
+        <td>Interactive 3-episode graph exploration demo</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Using Neo4j Backend</h2>
+  <p>
+    To use Neo4j instead of LiteDB, start a Neo4j instance and set environment variables:
+  </p>
+  <pre><code># Start Neo4j (Docker)
+docker run -d --name neo4j \
+  -p 7474:7474 -p 7687:7687 \
+  -e NEO4J_AUTH=neo4j/richlearning \
+  neo4j:5
+
+# Set connection info
+export NEO4J_URI=bolt://localhost:7687
+export NEO4J_USER=neo4j
+export NEO4J_PASSWORD=richlearning
+
+# Run without --litedb flag
+dotnet run -- SplitMnist</code></pre>
+
+  <h2>Docker (Full Stack)</h2>
+  <p>
+    A <code>docker-compose.yml</code> is included for running both Neo4j and the app together:
+  </p>
+  <pre><code>docker compose up --build</code></pre>
+  <p>
+    This starts Neo4j on port 7474/7687 and runs the Split-MNIST benchmark automatically.
+  </p>
+
+  <h2>Next Steps</h2>
+  <ul>
+    <li>Read the <a href="../architecture/">Architecture</a> guide to understand how the graph memory works</li>
+    <li>See <a href="../configuration/">Configuration</a> for tuning novelty thresholds and replay parameters</li>
+    <li>Explore the full <a href="../api-reference/">API Reference</a></li>
+  </ul>
+</DocsLayout>

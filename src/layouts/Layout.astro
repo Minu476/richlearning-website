@@ -8,6 +8,8 @@ const {
   title = "Rich Learning — Intelligence is a Path, Not a Layer",
   description = "Rich Learning replaces heavy deep learning compute with structured navigation. 0 Hidden Layers. 1/1000th the Energy."
 } = Astro.props;
+
+const base = import.meta.env.BASE_URL;
 ---
 <!doctype html>
 <html lang="en">
@@ -16,7 +18,7 @@ const {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content={description} />
   <title>{title}</title>
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -24,15 +26,16 @@ const {
 <body>
   <nav class="nav">
     <div class="nav-inner">
-      <a href="/" class="logo">
+      <a href={base} class="logo">
         <span class="logo-icon">◆</span> Rich Learning
       </a>
       <div class="nav-links">
-        <a href="#energy">Energy</a>
-        <a href="#how-it-works">How It Works</a>
-        <a href="#benchmark">Benchmark</a>
-        <a href="#blog">Blog</a>
-        <a href="https://github.com/RichLearning" class="nav-cta" target="_blank">GitHub</a>
+        <a href={`${base}docs/`}>Docs</a>
+        <a href={`${base}#energy`}>Energy</a>
+        <a href={`${base}#how-it-works`}>How It Works</a>
+        <a href={`${base}#benchmark`}>Benchmark</a>
+        <a href={`${base}#blog`}>Blog</a>
+        <a href="https://github.com/Minu476/rich-learning" class="nav-cta" target="_blank">GitHub</a>
       </div>
     </div>
   </nav>
@@ -48,15 +51,15 @@ const {
       <div class="footer-links">
         <div class="footer-col">
           <h4>Research</h4>
-          <a href="#benchmark">Benchmarks</a>
-          <a href="#blog">Engineering Log</a>
-          <a href="#">Paper (PDF)</a>
+          <a href={`${base}#benchmark`}>Benchmarks</a>
+          <a href={`${base}#blog`}>Engineering Log</a>
+          <a href={`${base}docs/architecture/`}>Architecture</a>
         </div>
         <div class="footer-col">
           <h4>Code</h4>
-          <a href="https://github.com/RichLearning" target="_blank">GitHub</a>
-          <a href="#">C# Reference</a>
-          <a href="#">Python PoC</a>
+          <a href="https://github.com/Minu476/rich-learning" target="_blank">GitHub</a>
+          <a href={`${base}docs/`}>Documentation</a>
+          <a href={`${base}docs/getting-started/`}>Getting Started</a>
         </div>
         <div class="footer-col">
           <h4>Connect</h4>

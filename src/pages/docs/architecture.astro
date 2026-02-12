@@ -1,0 +1,145 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+---
+
+<DocsLayout title="Architecture" activeSlug="architecture">
+  <h1>Architecture</h1>
+  <p>
+    Rich Learning is built on a simple premise: <strong>knowledge is topology, not weights</strong>. 
+    Instead of encoding learned behaviour in neural network parameters, we store it as a directed 
+    property graph where nodes represent states and edges represent transitions.
+  </p>
+
+  <h2>Core Insight</h2>
+  <blockquote>
+    <p>
+      Catastrophic forgetting happens because overwriting weights erases previous knowledge. 
+      A graph never forgets — adding a new node doesn't delete old ones.
+    </p>
+  </blockquote>
+
+  <h2>Component Hierarchy</h2>
+  <p>The system follows a three-layer hierarchy:</p>
+
+  <pre><code>┌─────────────────────────────────┐
+│       HierarchicalAgent         │  ← Manager: task selection
+├─────────────────────────────────┤
+│         Cartographer            │  ← Mid-level: planning & mapping
+├─────────────────────────────────┤
+│     TopologicalGraphMemory      │  ← Memory: graph CRUD & queries
+│     (LiteDB or Neo4j backend)   │
+└─────────────────────────────────┘</code></pre>
+
+  <h3>TopologicalGraphMemory (IGraphMemory)</h3>
+  <p>
+    The persistence layer. Stores <code>StateLandmark</code> nodes and <code>StateTransition</code> 
+    edges. Implements graph operations:
+  </p>
+  <ul>
+    <li><strong>CRUD</strong> — Upsert and retrieve landmarks and transitions</li>
+    <li><strong>Nearest Neighbour</strong> — Find the closest landmark to a new observation (cosine distance)</li>
+    <li><strong>Shortest Path</strong> — BFS/Cypher-based path finding between landmarks</li>
+    <li><strong>Cycle Detection</strong> — Identify loops in the agent's recent trajectory</li>
+    <li><strong>Frontier Discovery</strong> — Find under-explored landmarks at the boundary of known space</li>
+    <li><strong>Prioritised Replay</strong> — Sample transitions weighted by TD-error and staleness</li>
+    <li><strong>Cluster Assignment</strong> — Label propagation for discovering state-space regions</li>
+  </ul>
+  <p>
+    Two backends implement this interface: <code>LiteDbGraphMemory</code> (embedded, zero-config) 
+    and <code>Neo4jGraphMemory</code> (server-based, supports Cypher and graph visualisation).
+  </p>
+
+  <h3>Cartographer</h3>
+  <p>
+    The mid-level planner. Sits between raw observations and the memory backend. Responsibilities:
+  </p>
+  <ul>
+    <li><strong>State Observation</strong> — Encodes raw states via <code>IStateEncoder</code>, decides whether to create a new landmark or update an existing one using a novelty threshold</li>
+    <li><strong>Transition Recording</strong> — Logs transitions with reward, success rate, and temporal distance</li>
+    <li><strong>Loop Detection & Escape</strong> — Monitors a sliding window of recent landmarks; if a cycle is detected, selects an escape target from the frontier</li>
+    <li><strong>Subgoal Selection</strong> — Picks the next navigation target by scoring frontier nodes on novelty, visit count, and topological accessibility</li>
+    <li><strong>Replay Batch</strong> — Provides prioritised experience replay batches for policy improvement</li>
+  </ul>
+
+  <h3>HierarchicalAgent</h3>
+  <p>
+    The top-level manager that coordinates task assignment, delegates subgoals to the Cartographer, 
+    and receives completion signals from workers.
+  </p>
+
+  <h2>The DAPSA Pattern</h2>
+  <p>
+    Rich Learning follows the <strong>Discover → Analyse → Plan → Select → Act</strong> cycle:
+  </p>
+
+  <ol>
+    <li><strong>Discover</strong> — Observe raw state, encode as embedding</li>
+    <li><strong>Analyse</strong> — Nearest-neighbour lookup; is this novel or known?</li>
+    <li><strong>Plan</strong> — If novel: create landmark. If known: consider loop detection</li>
+    <li><strong>Select</strong> — Choose next subgoal (frontier exploration vs. exploitation)</li>
+    <li><strong>Act</strong> — Execute action, record transition, update graph</li>
+  </ol>
+
+  <h2>Data Model</h2>
+
+  <h3>StateLandmark (Node)</h3>
+  <p>
+    A sealed record representing a single mapped state in the topological graph:
+  </p>
+  <pre><code>StateLandmark
+├── Id: string                  // Unique identifier
+├── Embedding: double[]         // Vector representation of the state
+├── VisitCount: int             // How many times the agent has visited
+├── ValueEstimate: double       // EMA of cumulative reward
+├── NoveltyScore: double        // Decays with visits (starts at 1.0)
+├── UncertaintyScore: double    // Exploration signal
+├── ClusterId: int              // Region assignment via label propagation
+├── HierarchyLevel: int        // Position in abstraction hierarchy
+├── ActionCounts: Dict          // Per-action selection histogram
+├── PolicyEntropy: double       // Shannon entropy of action distribution
+└── EpisodicTraces: List        // Recent action-reward sequences</code></pre>
+
+  <h3>StateTransition (Edge)</h3>
+  <p>
+    A sealed record representing a directed edge between two landmarks:
+  </p>
+  <pre><code>StateTransition
+├── SourceId: string            // Origin landmark
+├── TargetId: string            // Destination landmark
+├── Action: int                 // Action that caused the transition
+├── Reward: double              // Observed reward
+├── RewardVariance: double      // Variance across observations
+├── TransitionCount: int        // Number of times traversed
+├── SuccessRate: double         // Proportion of successful transitions
+├── Confidence: double          // Reliability estimate
+├── TdError: double             // Temporal-difference error for replay
+├── TemporalDistance: int       // Steps between source and target
+├── IsMacroEdge: bool           // Multi-step abstract transition
+└── MacroPath: List&lt;string&gt;     // Intermediate landmarks for macro edges</code></pre>
+
+  <h2>Why No Weights?</h2>
+  <p>
+    In a traditional neural network, knowledge is smeared across millions of weights. 
+    Learning task B overwrites the weights tuned for task A — catastrophic forgetting.
+  </p>
+  <p>
+    In Rich Learning, each task's knowledge lives in its own region of the graph. 
+    Task B adds new nodes and edges; task A's nodes remain untouched. 
+    Cluster assignment and frontier scoring adapt to the full graph, 
+    enabling automatic knowledge transfer without interference.
+  </p>
+
+  <h2>Exploration Strategies</h2>
+  <p>
+    Exploration behaviour is fully configurable through four strategy interfaces:
+  </p>
+  <ul>
+    <li><strong>IFrontierScorer</strong> — Ranks frontier landmarks by novelty, visit count, and connectivity</li>
+    <li><strong>INoveltyGate</strong> — Decides if an observation is novel enough to create a new landmark (distance threshold)</li>
+    <li><strong>IPrioritySampler</strong> — Computes replay priority from TD-error, transition count, and staleness</li>
+    <li><strong>ILoopEscapeStrategy</strong> — Chooses an escape target when a trajectory cycle is detected</li>
+  </ul>
+  <p>
+    Default implementations are provided, but you can inject custom strategies for domain-specific exploration.
+  </p>
+</DocsLayout>
